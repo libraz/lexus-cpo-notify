@@ -1835,9 +1835,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lexus-notify-cloudflare-functions@workspace:.":
+"lexus-cpo-notify@workspace:.":
   version: 0.0.0-use.local
-  resolution: "lexus-notify-cloudflare-functions@workspace:."
+  resolution: "lexus-cpo-notify@workspace:."
   dependencies:
     "@biomejs/biome": "npm:^1.9.0"
     "@cloudflare/vitest-pool-workers": "npm:^0.6.0"
