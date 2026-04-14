@@ -17,6 +17,7 @@ export default {
 
   async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+
     if (url.pathname === '/run') {
       try {
         const results = await runAll(env);
@@ -26,9 +27,27 @@ export default {
         return Response.json({ error: String(error) }, { status: 500 });
       }
     }
+
+    if (url.pathname === '/listings') {
+      const category = url.searchParams.get('category') ?? 'LC';
+      const listings = await getAllListings(env.LEXUS_KV, category);
+      return Response.json(listings);
+    }
+
     return new Response('OK');
   },
 } satisfies ExportedHandler<Env>;
+
+async function getAllListings(kv: KVNamespace, category: string): Promise<Car[]> {
+  const keys = await kv.list({ prefix: `car:${category}:` });
+  const cars = await Promise.all(
+    keys.keys.map(async (key) => {
+      const data = await kv.get<Car>(key.name, 'json');
+      return data;
+    }),
+  );
+  return cars.filter((car): car is Car => car !== null);
+}
 
 async function runAll(env: Env) {
   // Group profiles by category to avoid fetching the same listing page twice
@@ -50,8 +69,9 @@ async function runAll(env: Env) {
       );
     }
 
-    // Save all vehicles to KV, determine new ones
+    // Save all vehicles to KV, mark sold ones, determine new ones
     const newItems = await saveAndFindNew(env.LEXUS_KV, category, currentItems);
+    await markSold(env.LEXUS_KV, category, currentItems);
 
     for (const profile of profiles) {
       const result = await processProfile(env, profile, newItems);
@@ -87,6 +107,24 @@ async function saveAndFindNew(kv: KVNamespace, category: string, items: Car[]): 
   );
 
   return newItems;
+}
+
+async function markSold(kv: KVNamespace, category: string, currentItems: Car[]): Promise<void> {
+  const currentIds = new Set(currentItems.map((item) => item.id));
+  const keys = await kv.list({ prefix: `car:${category}:` });
+
+  await Promise.all(
+    keys.keys.map(async (key) => {
+      const id = key.name.replace(`car:${category}:`, '');
+      if (currentIds.has(id)) return;
+
+      const car = await kv.get<Car>(key.name, 'json');
+      if (!car || car.soldAt) return;
+
+      car.soldAt = Math.floor(Date.now() / 1000);
+      await kv.put(key.name, JSON.stringify(car), { expirationTtl: KV_TTL });
+    }),
+  );
 }
 
 async function processProfile(env: Env, profile: SearchProfile, newItems: Car[]) {

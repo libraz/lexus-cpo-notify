@@ -38,6 +38,8 @@ export interface Car {
   dealer: string | null;
   region: string | null;
   createdAt: number;
+  /** Timestamp when vehicle was removed from listings (sold/withdrawn) */
+  soldAt: number | null;
 }
 
 export interface Env {

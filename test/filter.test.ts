@@ -33,6 +33,7 @@ function makeCar(overrides: Partial<Car> = {}): Car {
     dealer: 'レクサス宮崎',
     region: '宮崎',
     createdAt: Math.floor(Date.now() / 1000),
+    soldAt: null,
     ...overrides,
   };
 }

@@ -47,6 +47,7 @@ export async function scrapeListing(category: string): Promise<Car[]> {
       dealer: null,
       region: null,
       createdAt: Math.floor(Date.now() / 1000),
+      soldAt: null,
     };
 
     if (car.thumbnailUrl) {
