@@ -1,0 +1,12 @@
+name = "lexus-cpo-notify"
+main = "src/index.ts"
+compatibility_date = "2024-12-30"
+compatibility_flags = ["nodejs_compat"]
+
+[triggers]
+# JST 10:00 (UTC 1:00) and JST 22:00 (UTC 13:00) daily
+crons = ["0 1,13 * * *"]
+
+[[kv_namespaces]]
+binding = "LEXUS_KV"
+id = "98e7953b79704bf38e6fd8356d9b2daf"

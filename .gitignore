@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+.pnp.*
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+
+# Build
+dist/
+
+# Cloudflare
+.wrangler/
+.dev.vars
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+*.bak
+
+# macOS
+.DS_Store
+
+# Claude Code
+.claude/
+CLAUDE.md
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+
+# Environment
+.env
+.env.*
+!.env.example
