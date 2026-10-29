@@ -1,8 +1,7 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.0/schema.json",
-  "organizeImports": {
-    "enabled": true
-  },
+  "$schema": "https://biomejs.dev/schemas/2.6.4/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
@@ -20,7 +19,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "complexity": {
         "noForEach": "warn",
         "useOptionalChain": "error"
@@ -39,14 +38,14 @@
       },
       "suspicious": {
         "noExplicitAny": "warn",
-        "noConsoleLog": "off"
+        "noConsole": "off"
       },
       "nursery": {
-        "useSortedClasses": "off"
+        "useTailwindSortedClasses": "off"
       }
     }
   },
   "files": {
-    "ignore": ["node_modules", "dist", ".wrangler"]
+    "includes": ["**", "!**/node_modules", "!**/dist", "!**/.wrangler"]
   }
 }

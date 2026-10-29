@@ -34,7 +34,7 @@ Available category codes: `LC`, `RX`, `NX`, `LX`, `IS`, `ES`, `LS`, `RC`, `UX`, 
 
 ## Prerequisites
 
-- [mise](https://mise.jdx.dev/) (pins Node 22 + Yarn 4 via `mise.toml`)
+- [mise](https://mise.jdx.dev/) (pins Node 26 + Yarn 4 via `mise.toml`)
 - [Cloudflare account](https://dash.cloudflare.com/) (free plan is sufficient)
 - Discord server with a webhook URL
 
@@ -136,11 +136,11 @@ crons = ["0 1,13 * * *"]  # UTC 1:00 and 13:00 = JST 10:00 and 22:00
 
 ## KV Key Structure
 
-| Key pattern | Purpose | TTL |
-|---|---|---|
-| `car:{category}:{id}` | Vehicle listing + detail data | 90 days |
-| `notified:{id}` | Duplicate notification prevention | 90 days |
-| `error:{hash}` | Error notification suppression | 30 days |
+| Key pattern           | Purpose                           | TTL     |
+| --------------------- | --------------------------------- | ------- |
+| `car:{category}:{id}` | Vehicle listing + detail data     | 90 days |
+| `notified:{id}`       | Duplicate notification prevention | 90 days |
+| `error:{hash}`        | Error notification suppression    | 30 days |
 
 ## Cost
 
@@ -159,4 +159,4 @@ Runs comfortably within the **Cloudflare Workers Free plan**:
 - Discord Webhook API
 - Biome (linter/formatter)
 - Vitest (testing)
-- mise (Node 22 + Yarn 4)
+- mise (Node 26 + Yarn 4)
