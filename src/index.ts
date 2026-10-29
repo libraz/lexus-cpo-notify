@@ -18,16 +18,7 @@ export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
-    if (url.pathname === '/run') {
-      try {
-        const results = await runAll(env);
-        return Response.json(results);
-      } catch (error) {
-        await sendErrorNotification(env.DISCORD_WEBHOOK_URL, env.LEXUS_KV, error);
-        return Response.json({ error: String(error) }, { status: 500 });
-      }
-    }
-
+    // Scraping runs only from the cron trigger: a public route would let anyone spend KV writes and subrequests
     if (url.pathname === '/listings') {
       const category = url.searchParams.get('category') ?? 'LC';
       const listings = await getAllListings(env.LEXUS_KV, category);

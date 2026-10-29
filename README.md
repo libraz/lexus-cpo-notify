@@ -84,13 +84,14 @@ yarn deploy
 
 ### 6. Verify
 
-Trigger a manual run:
+The Worker exposes no route that starts a scrape, so a public URL cannot be used to run up KV writes or subrequests. Trigger a run from the Cloudflare dashboard: Workers & Pages → lexus-cpo-notify → Triggers → Cron → Trigger Now.
+
+To exercise the scheduled handler locally (local KV, your own IP):
 
 ```bash
-curl https://lexus-cpo-notify.<your-subdomain>.workers.dev/run
+yarn dev --test-scheduled
+curl http://localhost:8787/__scheduled
 ```
-
-Or from the Cloudflare dashboard: Workers & Pages → lexus-cpo-notify → Triggers → Cron → Trigger Now.
 
 ## GitHub Actions (CI/CD)
 
