@@ -2,12 +2,38 @@ import * as cheerio from 'cheerio';
 import { BASE_SITE_URL, getListUrl } from './config';
 import type { Car } from './types';
 
+const REQUEST_HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36',
+  Accept: 'text/html,application/xhtml+xml',
+  'Accept-Language': 'ja,en;q=0.8',
+};
+const MAX_ATTEMPTS = 3;
+const RETRY_DELAY_MS = 2000;
+
+/**
+ * Fetch a page, retrying on 403/429/5xx, which the site returns intermittently to Workers egress.
+ */
+async function fetchPage(url: string): Promise<Response> {
+  let res = await fetch(url, { headers: REQUEST_HEADERS });
+  for (let attempt = 1; attempt < MAX_ATTEMPTS && isRetryable(res.status); attempt++) {
+    await res.body?.cancel();
+    await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS * attempt));
+    res = await fetch(url, { headers: REQUEST_HEADERS });
+  }
+  return res;
+}
+
+function isRetryable(status: number): boolean {
+  return status === 403 || status === 429 || status >= 500;
+}
+
 /**
  * Scrape the Lexus CPO listing page for the given category.
  */
 export async function scrapeListing(category: string): Promise<Car[]> {
   const listUrl = getListUrl(category);
-  const res = await fetch(listUrl);
+  const res = await fetchPage(listUrl);
   if (!res.ok) {
     throw new Error(`Failed to fetch listing for ${category}: ${res.status}`);
   }
@@ -72,7 +98,7 @@ export async function scrapeListing(category: string): Promise<Car[]> {
 export async function scrapeDetail(
   detailUrl: string,
 ): Promise<{ interiorColor: string | null; engine: string | null }> {
-  const res = await fetch(detailUrl);
+  const res = await fetchPage(detailUrl);
   if (!res.ok) {
     return { interiorColor: null, engine: null };
   }
@@ -81,8 +107,12 @@ export async function scrapeDetail(
   const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
 
   // Interior color field
-  const interiorMatch = text.match(/インテリアカラー[：:\s]*([^\s,、]+)/);
-  const interiorColor = interiorMatch?.[1] ? interiorMatch[1].replace(/^・/, '') : null;
+  // Rendered as "インテリアカラー ・ レッド"; the bullet is a separator, not part of the value
+  // Some dealers leave the field empty and describe it only in the equipment notes ("＜インテリア＞ …")
+  const interiorMatch =
+    text.match(/インテリアカラー[：:・\s]*([^\s,、・]+)/) ??
+    text.match(/＜インテリア＞\s*([^\s＜]+)/);
+  const interiorColor = interiorMatch?.[1] ?? null;
 
   // Engine type field
   const engineMatch = text.match(/エンジン[：:\s]*([^\s,、]+)/);
