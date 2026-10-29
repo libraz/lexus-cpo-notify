@@ -34,7 +34,7 @@ Available category codes: `LC`, `RX`, `NX`, `LX`, `IS`, `ES`, `LS`, `RC`, `UX`, 
 
 ## Prerequisites
 
-- [Volta](https://volta.sh/) (pins Node 22 + Yarn 4)
+- [mise](https://mise.jdx.dev/) (pins Node 22 + Yarn 4 via `mise.toml`)
 - [Cloudflare account](https://dash.cloudflare.com/) (free plan is sufficient)
 - Discord server with a webhook URL
 
@@ -159,4 +159,4 @@ Runs comfortably within the **Cloudflare Workers Free plan**:
 - Discord Webhook API
 - Biome (linter/formatter)
 - Vitest (testing)
-- Volta (Node 22 + Yarn 4)
+- mise (Node 22 + Yarn 4)
